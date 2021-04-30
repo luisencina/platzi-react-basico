@@ -36,6 +36,17 @@ module.exports = {
                     'css-loader',
                     'sass-loader'
                 ]
+            },
+            {
+                test: /\.(png||gif|jpg)$/,
+                use: [
+                    {
+                        'loader': 'file-loader',
+                        options: {
+                            name: 'assets/[hash].[ext]'
+                        }
+                    }
+                ]
             }
         ]
     },
@@ -50,7 +61,7 @@ module.exports = {
     ],
     devServer: {
       open: true,
-      
+      historyApiFallback: true,
       watchOptions:{
           poll: true,
           ignored: "/node_modules/"
