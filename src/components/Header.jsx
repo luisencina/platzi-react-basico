@@ -1,37 +1,77 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
+import className from 'classnames'
+import gravatar from '../utils/gravatar'
+import { logoutRequest } from '../actions'
 import '../assets/styles/components/Header.scss'
 
 import logo from '../assets/static/logo-platzi-video-BW2.png'
 import userIcon from '../assets/static/user-icon.png'
 
+import PropTypes from 'prop-types';
 
 const header_menu_p = "Perfil";
 const header_menu_li_cuenta = "Cuenta"
 const header_menu_li_cerrar_sesion = "Iniciar Sesión"
 
-const Header = () => (
-    <header className="header">
+const Header = props => {
+    const { user, isLogin, isRegister } = props;
+    const hasUser = Object.keys(user).length > 0;
 
-        <Link to="/">
-            <img className="header__img" src={logo} alt="Platzi Video" />
-        </Link>
+    const handleLogout = () => {
+        props.logoutRequest({});
+    }
+    const headerClass = className('header', {
+        isLogin,
+        isRegister,
+    })
+    return (
+        <header className={headerClass}>
 
-        <div className="header__menu">
-            <div className="header__menu--profile">
-                <img src={userIcon} alt="" />
-                <p>{header_menu_p}</p>
+            <Link to="/">
+                <img className="header__img" src={logo} alt="Platzi Video" />
+            </Link>
+
+            <div className="header__menu">
+                <div className="header__menu--profile">
+                    {hasUser ?  
+                        <img src={gravatar(user.email)} alt={user.email}/> :
+                        <img src={userIcon} alt="" /> 
+                    }   
+                    <p>{header_menu_p}</p>
+                </div>
+                <ul>
+                    {hasUser ? 
+                        <li><a href="/">{user.name}</a></li> : 
+                        null
+                    }
+                    {hasUser ?
+                    <li><a href='#logout' onClick={handleLogout}>Cerrar Sesión</a></li> : (
+                    <li>
+                        <Link to='/Login'>
+                        Iniciar sesión
+                        </Link>
+                    </li>
+                    )}
+                </ul>
             </div>
-            <ul>
-                <li><a href="/">{header_menu_li_cuenta}</a></li>
-                <li>
-                    <Link to="/login">
-                        {header_menu_li_cerrar_sesion}
-                    </Link>
-                </li>
-            </ul>
-        </div>
-  </header>
-);
+    </header>
+    );
+}
 
-export default Header;
+const mapStateToProps = state => {
+    return {
+        user: state.user
+    };
+};
+
+const mapDispatchToProps = {
+    logoutRequest,
+}
+
+Header.propTypes = {
+    user: PropTypes.object
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header)
